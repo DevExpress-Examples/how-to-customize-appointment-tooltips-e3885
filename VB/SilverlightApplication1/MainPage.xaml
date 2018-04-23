@@ -1,0 +1,105 @@
+﻿<UserControl x:Class="SilverlightApplication1.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:dxsch="http://schemas.devexpress.com/winfx/2008/xaml/scheduler"
+    xmlns:riaControls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.DomainServices"
+    xmlns:local="clr-namespace:SilverlightApplication1.Web"
+    mc:Ignorable="d"
+    d:DesignHeight="478" d:DesignWidth="590">
+
+    <UserControl.Resources>
+        <riaControls:DomainDataSource Name="domainDataSource1" x:Key="appointmentsDomainDataSource"
+                                  AutoLoad="True" LoadedData="DomainDataSource_LoadedData"
+                                  QueryName="GetCarSchedulingQuery"
+                                  SubmittedChanges="DomainDataSource_SubmittedChanges">
+            <riaControls:DomainDataSource.DomainContext>
+                <local:SchedulingDomainContext/>
+            </riaControls:DomainDataSource.DomainContext>
+        </riaControls:DomainDataSource>
+
+        <riaControls:DomainDataSource x:Key="resourcesDomainDataSource" 
+                                  AutoLoad="True" LoadedData="DomainDataSource_LoadedData"
+                                  QueryName="GetCarsQuery">
+            <riaControls:DomainDataSource.DomainContext>
+                <local:SchedulingDomainContext/>
+            </riaControls:DomainDataSource.DomainContext>
+        </riaControls:DomainDataSource>
+
+        <!--AppointmentTooltipTemplate-->
+        <DataTemplate x:Key="AppointmentTooltipContentTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="AUTO"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.RowSpan="2" Margin="2" BorderThickness="1"
+                BorderBrush="DarkGray" CornerRadius="2">
+                    <Image Stretch="Uniform" 
+                    MaxWidth="140" MaxHeight="100" 
+                    Source="{Binding Path=CustomViewInfo}"/>
+                </Border>
+
+                <TextBlock Grid.Column="1" Text="{Binding Path=Subject}"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=Location}"/>
+                <TextBlock Grid.Row="2" Grid.ColumnSpan="2"  Text="{Binding Path=Description}"/>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid x:Name="LayoutRoot" Background="White">
+        <dxsch:SchedulerControl Name="schedulerControl1"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                            ActiveViewType="Week"
+                            GroupType="None"
+                            AppointmentViewInfoCustomizing="schedulerControl1_AppointmentViewInfoCustomizing">
+
+            <!--region #SchedulerStorage-->
+            <dxsch:SchedulerControl.Storage>
+                <dxsch:SchedulerStorage 
+                AppointmentCollectionModified="SchedulerStorage_AppointmentCollectionModified">
+                    <dxsch:SchedulerStorage.AppointmentStorage>
+                        <dxsch:AppointmentStorage 
+                        DataSource="{Binding Source={StaticResource ResourceKey=appointmentsDomainDataSource}, Path=Data}">
+                            <dxsch:AppointmentStorage.Mappings>
+                                <dxsch:AppointmentMapping  
+                                Start="StartTime" 
+                                End="EndTime" 
+                                AllDay="AllDay" 
+                                Description="Description" 
+                                Label="Label" 
+                                Location="Location" 
+                                Subject="Subject" 
+                                RecurrenceInfo="RecurrenceInfo" 
+                                ReminderInfo="ReminderInfo"
+                                ResourceId="CarId"
+                                Status="Status" 
+                                Type="EventType"/>
+                            </dxsch:AppointmentStorage.Mappings>
+                        </dxsch:AppointmentStorage>
+                    </dxsch:SchedulerStorage.AppointmentStorage>
+
+                    <!--region #ResourceMappings-->
+                    <dxsch:SchedulerStorage.ResourceStorage>
+                        <dxsch:ResourceStorage 
+                    DataSource="{Binding Source={StaticResource ResourceKey=resourcesDomainDataSource}, Path=Data}">
+                            <dxsch:ResourceStorage.Mappings>
+                                <dxsch:ResourceMapping Id="ID" Caption="Model" Image="Picture"/>
+                            </dxsch:ResourceStorage.Mappings>
+                        </dxsch:ResourceStorage>
+                    </dxsch:SchedulerStorage.ResourceStorage>
+                    <!--endregion #ResourceMappings-->
+
+                </dxsch:SchedulerStorage>
+            </dxsch:SchedulerControl.Storage>
+            <!--endregion #SchedulerStorage-->
+        </dxsch:SchedulerControl>
+    </Grid>
+</UserControl>
